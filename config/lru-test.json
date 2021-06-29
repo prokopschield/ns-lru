@@ -1,0 +1,12 @@
+{
+	"store": {
+		"keyv:foo": "{\"value\":\"bar\",\"expires\":null}",
+		"keyv:test": "{\"value\":\":base64:dGVzdA==\",\"expires\":null}",
+		"keyv:0": "{\"value\":0,\"expires\":null}",
+		"keyv:1": "{\"value\":1,\"expires\":null}",
+		"keyv:2": "{\"value\":2,\"expires\":null}",
+		"keyv:4": "{\"value\":4,\"expires\":null}",
+		"keyv:5": "{\"value\":5,\"expires\":null}",
+		"keyv:yarn.lock": "{\"value\":\"::nsblob:80fdd75009be3c54777eaf30c701824672a11966fb284ecda4d74ded21a10ae9\",\"expires\":null}"
+	}
+}

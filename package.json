@@ -1,0 +1,23 @@
+{
+	"name": "ns-lru",
+	"description": "Key-Value cache with NodeSite.eu as storage backend",
+	"version": "0.0.1-1",
+	"main": "lib/index.js",
+	"scripts": {
+		"start": "node lib/cli",
+		"test": "npx nslibmgr test"
+	},
+	"author": "Prokop Schield",
+	"license": "GPL-3.0-or-later",
+	"devDependencies": {
+		"@types/keyv": "^3.1.1",
+		"@types/node": ">=14"
+	},
+	"keywords": [],
+	"dependencies": {
+		"blakets": "^0.0.0-4",
+		"keyv": "^4.0.3",
+		"nsblob": "^0.2.6",
+		"quick-lru": "5.1.1"
+	}
+}
