@@ -25,7 +25,7 @@ const options = {
 	// How many items should be stored in RAM?
 };
 
-const lru = new LRU<K, V>(options);
+const lru = new LRU<V>(options);
 
 lru.get(key: K) => Promise<V>;
 lru.set(key: K, val: V) => lru;

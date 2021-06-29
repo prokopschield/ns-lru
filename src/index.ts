@@ -4,8 +4,8 @@ import QuickLRU from 'quick-lru';
 
 const size_limit_nsblob = nsblob.config.num.file_size_limit;
 
-export class LRU<K, V>
-	implements Map<K, V | Promise<V | string | Buffer | undefined>>
+export class LRU<V>
+	implements Map<string, V | Promise<V | string | Buffer | undefined>>
 {
 	constructor(
 		options: {
@@ -41,20 +41,19 @@ export class LRU<K, V>
 			maxSize: 1,
 		}
 	) {
-		this._cache = new QuickLRU<K, V>({
+		this._cache = new QuickLRU<string, V>({
 			maxSize: options.maxSize || 1,
 			onEviction: (key, val) => this._evicted(key, val),
 		});
 		this._store = new Keyv<V>(options);
 	}
 
-	private _tmp = new Map<K, V>();
-	private _cache: QuickLRU<K, V>;
+	private _tmp = new Map<string, V>();
+	private _cache: QuickLRU<string, V>;
 	private _store: Keyv<V | string>;
-	private async _evicted(key: K, val: V) {
+	private async _evicted(key: string, val: V) {
 		this._tmp.set(key, val);
 		let _val = val;
-		const skey = `${key}`;
 		if (_val instanceof Promise) {
 			_val = await _val;
 		}
@@ -65,11 +64,11 @@ export class LRU<K, V>
 				return;
 			}
 			const stored = await nsblob.store(Buffer.from(_val));
-			this._store.set(skey, `:nsblob:${stored}`);
+			this._store.set(key, `:nsblob:${stored}`);
 			return;
 		}
 		this._store
-			.set(skey, _val)
+			.set(key, _val)
 			.then(() => val === this._tmp.get(key) && this._tmp.delete(key));
 	}
 
@@ -84,7 +83,7 @@ export class LRU<K, V>
 	/**
 	 * Delete key-value pair from RAM and storage
 	 */
-	public delete(key: K): boolean {
+	public delete(key: string): boolean {
 		this._cache.delete(key);
 		this._store.delete(`${key}`);
 		return true;
@@ -94,7 +93,7 @@ export class LRU<K, V>
 	 * Calls callback for each entry in RAM
 	 */
 	public forEach(
-		callbackfn: (value: V, key: K, map: LRU<K, V>) => void,
+		callbackfn: (value: V, key: string, map: LRU<V>) => void,
 		thisArg?: any
 	): void {
 		for (const [key, value] of this._cache) {
@@ -105,7 +104,7 @@ export class LRU<K, V>
 	/**
 	 * Get value by key
 	 */
-	public async get(key: K): Promise<V | Buffer | string | undefined> {
+	public async get(key: string): Promise<V | Buffer | string | undefined> {
 		let val =
 			this._cache.get(key) ??
 			this._tmp.get(key) ??
@@ -118,22 +117,22 @@ export class LRU<K, V>
 	/**
 	 * Is key-value in RAM?
 	 */
-	public has(key: K): boolean {
+	public has(key: string): boolean {
 		return this._cache.has(key);
 	}
 
 	/**
 	 * Is key-value pair in either RAM or storage?
 	 */
-	public async hasStored(key: K): Promise<boolean> {
+	public async hasStored(key: string): Promise<boolean> {
 		return this._cache.has(key) || !!(await this._store.get(`${key}`));
 	}
 
 	/**
 	 * Set a key-value pair
 	 */
-	public set(key: K, value: V): this {
-		this._cache.set(key, value);
+	public set(key: string | number, value: V): this {
+		this._cache.set(`${key}`, value);
 		return this;
 	}
 
@@ -147,7 +146,7 @@ export class LRU<K, V>
 	/**
 	 * Returns an iterable of entries in the map.
 	 */
-	*[Symbol.iterator](): IterableIterator<[K, V]> {
+	*[Symbol.iterator](): IterableIterator<[string, V]> {
 		return this.entries();
 	}
 
