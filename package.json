@@ -1,7 +1,7 @@
 {
 	"name": "ns-lru",
 	"description": "Key-Value cache with NodeSite.eu as storage backend",
-	"version": "0.0.1-2",
+	"version": "0.0.1-3",
 	"main": "lib/index.js",
 	"scripts": {
 		"start": "node lib/cli",

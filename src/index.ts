@@ -102,16 +102,49 @@ export class LRU<V>
 	}
 
 	/**
-	 * Get value by key
+	 * General item query.
+	 *
+	 * This function will not return a Buffer that has been
+	 * dumped out of RAM, and will instead return a string.
+	 *
+	 * Use get_buffer() if you are expecting a Buffer.
 	 */
-	public async get(key: string): Promise<V | Buffer | string | undefined> {
+	public async get(key: string): Promise<V | string | undefined> {
 		let val =
 			this._cache.get(key) ??
 			this._tmp.get(key) ??
 			(await this._store.get(`${key}`));
+		return val;
+	}
+
+	/**
+	 * Read value as Buffer, or return undefined.
+	 */
+	public async get_buffer(key: string): Promise<Buffer | undefined> {
+		const val = await this.get(key);
 		if (typeof val === 'string' && val.match(/^\:nsblob\:[a-f0-9]{64}$/)) {
 			return nsblob.fetch(val.substr(8));
-		} else return val;
+		} else if (val instanceof Uint8Array || typeof val === 'string') {
+			return Buffer.from(val);
+		} else return;
+	}
+
+	/**
+	 * Read value as string, or return undefined.
+	 */
+	public async get_string(key: string): Promise<string | undefined> {
+		const val = await this.get(key);
+		if (typeof val === 'string') return val;
+		else return;
+	}
+
+	/**
+	 * Read value as object, or return undefined.
+	 */
+	public async get_object(key: string): Promise<V | undefined> {
+		const val = await this.get(key);
+		if (typeof val === 'object') return val;
+		else return;
 	}
 
 	/**
